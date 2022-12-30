@@ -1,0 +1,116 @@
+quest flame_dungeon begin
+	state start begin
+		when 20394.chat."Purgatoriul Iadului" begin
+			say_title(mob_name(20394))
+			say("Miturile spun ca  Razador se gaseste traversând acest portal,")
+			say("însa nimeni nu a reusit sa iasa sa ne vorbeasca despre el.")
+			say("Vrei sa aflam?")
+
+
+			local s= select("Da", "Nu")
+			if s == 2 then
+				return
+			end
+
+			if party.is_party() then
+				if not party.is_leader() then
+					say("Debes ser líder de un grupo.")
+					return
+				end
+
+				local pids = {party.get_member_pids()}
+
+				local timerCheck = true
+				local levelCheck = true
+				local ticketCheck = true
+
+				for i, pid in next, pids, nil do
+					-->q.begin_other_pc_block(pid)
+
+					if game.check_event(5, pc.get_empire()) == true then
+						if ((get_global_time() - pc.getf("flame_dungeon","exit_time")) < 60*30) then 
+							timerCheck = false
+						end
+					else
+						if ((get_global_time() - pc.getf("flame_dungeon","exit_time")) < 60*60) then 
+							timerCheck = false
+						end
+					end
+
+					if pc.count_item(50150) < 1 then
+						ticketCheck = false
+					end
+
+					if pc.get_level() < 90 then
+						levelCheck = false
+					end
+
+					-->q.end_other_pc_block()
+				end
+
+
+				if not timerCheck then
+					if game.check_event(5, pc.get_empire()) == true then
+						say("Deben esperar 30 minutos para reingresar.")
+					else
+						say("Deben esperar 1 hora para reingresar.")
+					end
+					return
+				end
+
+				if not levelCheck then
+					say("Todos los miembros del grupo deben ser nivel 90 o +.")
+					return
+				end
+
+				if not ticketCheck then
+					say("Para acceder, todos los miembros deben")
+					say("tener: "..item_name(50150)..".")
+            
+					return
+				end
+                
+				-->Quitar llaves
+				for i, pid in next, pids, nil do
+					-->q.begin_other_pc_block(pid)
+					pc.remove_item(50150, 1)
+					pc.setf("flame_dungeon","exit_time", get_global_time())
+					-->q.end_other_pc_block()
+				end
+			else
+				if game.check_event(5, pc.get_empire()) == true then
+					if ((get_global_time() - pc.getf("flame_dungeon","exit_time")) < 60*30) then 
+						say("Debes esperar 30 minutos para reingresar.")
+						return
+					end
+				else
+					if ((get_global_time() - pc.getf("flame_dungeon","exit_time")) < 60*60) then 
+						say("Debes esperar 1 hora para reingresar.")
+						return
+
+					end
+				end
+
+				if pc.count_item(50150) < 1 then
+					say("Debes tener al menos un pasaje de entrada en tu inventario.")
+					return
+				end
+
+				if pc.get_level() < 90 then
+					say("Debes ser nivel 90 o + para poder ingresar a esta mazmorra.")
+					return
+				end
+
+				pc.setf("flame_dungeon","exit_time", get_global_time())
+				pc.remove_item(50150, 1)
+
+			end
+
+			onlychat_notice_all("[CH "..get_channel_id().."]: ¡El grupo de "..pc.get_name().." ha ingresado a la Mazmorra de Arrador!")
+			GeneralDungeon.ArradorAccess()
+
+		end
+	end
+end
+
+
