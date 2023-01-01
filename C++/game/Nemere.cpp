@@ -510,7 +510,7 @@ namespace Nemere
 		e_LimitEvent = NULL;
 
 		SetDungeonStep(0);
-		SetMapIndex(NULL);
+		SetMapIndex(0); //Before SetMapIndex(NULL);
 		SetMapSectree(NULL);
 		SetParty(NULL);
 
