@@ -436,7 +436,7 @@ namespace Arrador
 		SetDungeonStep(0);
 		SetDungeonSubStep(0);
 		SetIsDungeonStep(false);
-		SetMapIndex(NULL);
+		SetMapIndex(0); //Before SetMapIndex(NULL);
 		SetMapSectree(NULL);
 
 		SetStoneLevel2(NULL);
